@@ -3,10 +3,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // 主进程-渲染器
-  set: (title) => ipcRenderer.send('set', title),
-  // 渲染器-主进程
-  open: () => ipcRenderer.invoke('open'),
   // 监听器
-  onUpdate: (callback) => ipcRenderer.on('update', callback)
+  uploadValue: (callback) => ipcRenderer.on('uploadValue', callback)
 })

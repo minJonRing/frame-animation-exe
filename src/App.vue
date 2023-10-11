@@ -1,23 +1,30 @@
 <template>
   <div class="app">
     <!-- <div class="anime" @click="handleSet">set</div> -->
-    <Anime />
+    <Anime :animeGroup="animeGroup" />
   </div>
 </template>
 
 <script>
 import Anime from '@/modules/anime/index.vue'
 export default {
-  mounted() {
-    console.log(window.electronAPI)
-    // 监听进程推送信息
-    window.electronAPI?.onUpdate((e, v) => {
-      console.log(v)
-    })
+  name: 'App',
+  data() {
+    return {
+      animeGroup: 0
+    }
   },
   components: {
     Anime
   },
+  mounted() {
+    console.log(window.electronAPI)
+    // 监听进程推送信息
+    window.electronAPI?.uploadValue((e, v) => {
+      this.animeGroup = +v
+    })
+  },
+
   methods: {
     handleSet() {
       window.electronAPI.set(Math.floor(Math.random() * 10) + '')

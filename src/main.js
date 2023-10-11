@@ -1,6 +1,6 @@
 import { initUdp } from "./udp/index";
 
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -8,23 +8,6 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-// 主进程-渲染器
-const send = () => {
-  ipcMain.on("set", (event, title) => {
-    // web 上下文
-    const webContents = event.sender;
-    const win = BrowserWindow.fromWebContents(webContents);
-    // 设置内容
-    win.setTitle(title);
-  });
-};
-
-const invoke = () => {
-  // 渲染器-主进程
-  ipcMain.handle("open", () => {
-    return "open";
-  });
-};
 
 const createWindow = () => {
   // Create the browser window.
@@ -38,32 +21,26 @@ const createWindow = () => {
     // frame: false,
     // transparent: true
   });
+  mainWindow.setFullScreen(true);
+  Menu.setApplicationMenu(null)
   // udp进程
   initUdp({
     success: (msg, info) => {
       const value = msg.toString();
-      switch (value) {
-        case "add":
-          mainWindow.webContents.send("update", value);
-          break;
-        default:
-          break;
-      }
+      mainWindow.webContents.send("uploadValue", value);
     },
   });
   // handle
-  send();
-  invoke();
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, `../../dist/index.html`));
     // mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
   // 全屏
   // mainWindow.maximize()
 };
