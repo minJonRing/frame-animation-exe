@@ -14,14 +14,14 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    // fullscreen: true,
+    fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
     // frame: false,
     // transparent: true
   });
-  mainWindow.setFullScreen(true);
+  // mainWindow.setFullScreen(true);
   Menu.setApplicationMenu(null)
   // udp进程
   initUdp({
@@ -36,8 +36,8 @@ const createWindow = () => {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, `../../dist/index.html`));
-    // mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    // mainWindow.loadFile(path.join(__dirname, `../../dist/index.html`));
+    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
   // Open the DevTools.

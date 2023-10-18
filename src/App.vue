@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <!-- <div class="anime" @click="handleSet">set</div> -->
-    <Anime :animeGroup="animeGroup" />
+    <Anime :animeGroup="animeGroup" :entity="entity" :entityKey="entityKey" />
   </div>
 </template>
 
@@ -11,7 +11,8 @@ export default {
   name: 'App',
   data() {
     return {
-      animeGroup: 0
+      entity: 1,
+      animeGroup: 0,
     }
   },
   components: {
@@ -21,7 +22,17 @@ export default {
     console.log(window.electronAPI)
     // 监听进程推送信息
     window.electronAPI?.uploadValue((e, v) => {
-      this.animeGroup = +v
+      const [a, b] = v.split('/')
+      this.entity = +a;
+      this.$nextTick(() => {
+        if (this.entity) {
+          this.entityKey = +b
+        } else {
+          this.animeGroup = +b
+        }
+
+      })
+
     })
   },
 
