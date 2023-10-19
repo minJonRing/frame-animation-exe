@@ -1,10 +1,9 @@
-
-export const title = 'window程序'
+export const title = "window程序";
 export const udp = {
-  prot: '8080',
-  address: '127.0.0.1'
-}
+  prot: "8080",
+  address: "172.20.20.36",
+};
 export default {
   title,
-  udp
-}
+  udp,
+};
