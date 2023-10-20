@@ -1,7 +1,9 @@
-export const title = "window程序";
+export const title = "桌面程序程序";
+const ip = require("ip");
+
 export const udp = {
   prot: "8080",
-  address: "172.20.20.36",
+  address: ip.address(),
 };
 export default {
   title,

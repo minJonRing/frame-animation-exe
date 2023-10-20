@@ -14,7 +14,7 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    fullscreen: true,
+    fullscreen: MAIN_WINDOW_VITE_DEV_SERVER_URL ? false : true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },

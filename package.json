@@ -1,6 +1,6 @@
 {
-  "name": "app2",
-  "productName": "app2",
+  "name": "transparent screen",
+  "productName": "transparent screen",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
@@ -34,6 +34,7 @@
     "@tweenjs/tween.js": "^21.0.0",
     "dgram": "^1.0.1",
     "electron-squirrel-startup": "^1.0.0",
+    "ip": "^1.1.8",
     "swiper": "^10.0.4",
     "vue": "^3.2.47"
   }

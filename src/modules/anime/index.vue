@@ -1,6 +1,6 @@
 <template>
   <div class="animation">
-    <div :class="['content', !entity ? 'active' : '']">
+    <div :class="['content', entity ? 'active' : '']">
       <div class="all-title">
         <img :src="ImgTitle" />
       </div>
@@ -96,10 +96,6 @@
         </div>
       </div>
     </div>
-    <div :class="['circle', entity ? 'active' : '']">
-      <img class="bottle" v-for="(item, index) in circleFile" :key="index" :src="item"
-        :style="{ visibility: circleIndex === index ? 'inherit' : 'hidden' }" />
-    </div>
     <!-- <div class="next" @click="handleNext">next</div>
     <div class="prev" @click="handlePrev">prev</div> -->
   </div>
@@ -129,10 +125,6 @@ export default {
   },
   data() {
     return {
-      circleFile: [],
-      circle: 0,
-      circleIndex: 0,
-      // 
       ImgTitle,
       // 
       animeObject: {},
@@ -179,11 +171,10 @@ export default {
 
   },
   mounted() {
-    this.loadCircleFile();
     this.loadDecorationFile()
     this.loadFile()
-    requestAnimationFrame(this.animate)
     this.setAnime(1)
+    requestAnimationFrame(this.animate)
   },
   methods: {
     handleNext() {
@@ -205,12 +196,6 @@ export default {
     },
     scrollTow() {
       return `scroll-2-${this.animeKey}`
-    },
-    // 加载圆圈
-    loadCircleFile() {
-      const circleFile = Object.values(import.meta.globEager('@/assets/circle/*.png', { as: "url" }));
-      this.circle = circleFile.length - 1;
-      this.circleFile = circleFile
     },
     // 加载其他装饰png
     loadDecorationFile() {
@@ -443,7 +428,7 @@ export default {
         }
         // 文字装饰
         this.textDecorationIndex = this.textDecorationIndex === this.textDecorationLen ? 0 : this.textDecorationIndex + 1;
-        this.circleIndex = this.circleIndex === this.circle ? 0 : this.circleIndex + 1;
+
       }
       // 其他循环动画
       requestAnimationFrame(this.animate)
@@ -481,25 +466,7 @@ export default {
   height: 1080px;
   overflow: hidden;
 
-  .circle {
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    z-index: 9;
 
-    &.active {
-      opacity: 1;
-
-    }
-
-    img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: block;
-    }
-  }
 
   .content {
     position: relative;
@@ -509,7 +476,6 @@ export default {
 
     &.active {
       opacity: 1;
-
     }
 
     .all-title {
