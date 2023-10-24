@@ -1,6 +1,6 @@
 {
-  "name": "transparent screen",
-  "productName": "transparent screen",
+  "name": "transparent-screen",
+  "productName": "transparent-screen",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",

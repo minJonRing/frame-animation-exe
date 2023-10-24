@@ -472,6 +472,7 @@ export default {
     position: relative;
     height: 100%;
     z-index: 2;
+    background-color: rgba(0, 0, 0, .7);
     opacity: 0;
 
     &.active {
@@ -823,7 +824,7 @@ export default {
           }
 
           .w-cn {
-            // color: #fff;
+            color: #000;
             font-size: 16px;
             line-height: 26px;
             letter-spacing: 1.6px;
@@ -831,8 +832,7 @@ export default {
 
           .w-en {
             font-size: 16px;
-            // color: #fff;
-
+            color: #000;
             line-height: 26px;
             word-break: break-all;
             word-wrap: break-word;
@@ -843,7 +843,7 @@ export default {
 
 
           .w-other {
-            // color: #fff;
+            color: #000;
             position: relative;
             font-size: 16px;
             line-height: 26px;
