@@ -58,8 +58,8 @@
               <feMergeNode in="SourceGraphic"></feMergeNode>
             </feMerge>
           </filter>
-          <polyline class="link-move" points="10,90 90,90 90,10 220,10" fill="transparent" stroke="#fff" stroke-width="10"
-            stroke-dasharray="10 86.6" filter="url(#linkOutShadow2)" />
+          <polyline class="link-move" points="10,90 90,90 90,10 220,10" fill="transparent" stroke="#fff"
+            stroke-width="10" stroke-dasharray="10 86.6" filter="url(#linkOutShadow2)" />
         </svg>
         <!-- 文字框 -->
         <Box :style="{ top: '570px', right: '130px' }" />
@@ -74,7 +74,8 @@
         </div>
         <div class="word-item word-item-1">
           <div class="words">
-            <div :class="['scroll', scrollOne()]">
+            <div ref="scroll1" :class="['scroll', scrollOne(), set ? 's' : '']"
+              :style="{ '--x': translate.a.x, '--t': translate.a.time, '--a': translate.a.scroll }">
               <template v-for="(item, index) in textObj.html[0] || []" :key="index">
                 <div :class="['w-title', 'w-cn', 'w-en', 'w-other'][item.type]">{{ item.label }}</div>
               </template>
@@ -83,7 +84,8 @@
         </div>
         <div class="word-item word-item-2">
           <div class="words">
-            <div :class="['scroll', scrollTow()]">
+            <div ref="scroll2" :class="['scroll', scrollTow(), set ? 's' : '']"
+              :style="{ '--x': translate.b.x, '--t': translate.b.time, '--a': translate.b.scroll }">
               <template v-for="(item, index) in textObj.html[1] || []" :key="index">
                 <div :class="['w-title', 'w-cn', 'w-en', 'w-other'][item.type]">{{ item.label }}</div>
               </template>
@@ -96,8 +98,8 @@
         </div>
       </div>
     </div>
-    <!-- <div class="next" @click="handleNext">next</div>
-    <div class="prev" @click="handlePrev">prev</div> -->
+    <div class="next" @click="handleNext">next</div>
+    <div class="prev" @click="handlePrev">prev</div>
   </div>
 </template>
 
@@ -107,6 +109,8 @@ import ImgTitle from '@/assets/title.png'
 import Box from './box.vue'
 import Decoration from './decoration.vue'
 import { texts } from './text'
+import { ajax } from '@/api/ajax'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Anime',
   props: {
@@ -152,10 +156,17 @@ export default {
       textObj: {
         html: []
       },
+      setAnimeKey: 0,
+      translate: {
+        a: { y: 0, time: 0, scroll: false },
+        b: { y: 0, time: 0, scroll: false },
+      },
+      set: false
       // 
     }
   },
   computed: {
+    ...mapGetters(['reset']),
     box() {
       return Object.values(this.animeObject)
     }
@@ -164,9 +175,12 @@ export default {
     animeGroup(data) {
       this.setAnime(data)
     },
-
+    reset(data) {
+      data && this.getData()
+    }
   },
   created() {
+    this.getData()
     this.animeKey = this.animeGroup;
 
   },
@@ -177,6 +191,14 @@ export default {
     requestAnimationFrame(this.animate)
   },
   methods: {
+    getData() {
+      ajax({
+        url: '/getData'
+      }).then((({ data }) => {
+        this.texts = data;
+        this.setAnime(this.setAnimeKey || 1)
+      }))
+    },
     handleNext() {
       let i = this.animeKey + 1
       if (i > 29) {
@@ -448,10 +470,31 @@ export default {
       this.animeMid = mid;
       // text
       this.textObj = this.texts[key]
+      this.set = false;
       this.$nextTick(() => {
-        this.animeStart = true
+        this.animeStart = true;
+        this.setAnimaTime()
       })
     },
+    setAnimaTime() {
+      const s1 = this.$refs.scroll1;
+      const s2 = this.$refs.scroll2;
+      const sub1 = s1.clientHeight - 334;
+      const sub2 = s2.clientHeight - 334;
+      this.translate = {
+        a: {
+          x: -sub1,
+          time: Math.ceil(sub1 / 100) * 10000 + 'ms',
+          scroll: sub1 > 0 ? 'running' : 'paused'
+        },
+        b: {
+          x: -sub2,
+          time: Math.ceil(sub2 / 100) * 10000 + 'ms',
+          scroll: sub2 > 0 ? 'running' : 'paused'
+        }
+      }
+      this.set = true
+    }
   }
 }
 </script>
@@ -683,24 +726,28 @@ export default {
           overflow: hidden;
 
           .scroll {
-            animation-delay: 2000ms;
+            animation-delay: 5000ms;
             transform: matrix(1, 0, 0, 1, 0, 0);
 
-            &.scroll-1-15 {
-              animation: anima115 30000ms linear infinite;
+            &.s {
+              animation-name: animaauto;
+              animation-duration: var(--t);
+              animation-timing-function: linear;
+              animation-iteration-count: infinite;
+              animation-play-state: var(--a);
             }
 
-            @keyframes anima115 {
+            @keyframes animaauto {
               0% {
                 transform: matrix(1, 0, 0, 1, 0, 0);
               }
 
               30% {
-                transform: matrix(1, 0, 0, 1, 0, -304);
+                transform: matrix(1, 0, 0, 1, 0, var(--x));
               }
 
               50% {
-                transform: matrix(1, 0, 0, 1, 0, -304);
+                transform: matrix(1, 0, 0, 1, 0, var(--x));
               }
 
               80% {
@@ -712,83 +759,109 @@ export default {
               }
             }
 
-            &.scroll-1-26 {
-              animation: anima126 30000ms linear infinite;
-            }
+            // &.scroll-1-15 {
+            //   animation: anima115 30000ms linear infinite;
+            // }
 
-            @keyframes anima126 {
-              0% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
+            // @keyframes anima115 {
+            //   0% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
 
-              30% {
-                transform: matrix(1, 0, 0, 1, 0, -186);
-              }
+            //   30% {
+            //     transform: matrix(1, 0, 0, 1, 0, -304);
+            //   }
 
-              50% {
-                transform: matrix(1, 0, 0, 1, 0, -186);
-              }
+            //   50% {
+            //     transform: matrix(1, 0, 0, 1, 0, -304);
+            //   }
 
-              80% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
+            //   80% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
 
-              100% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
-            }
+            //   100% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
+            // }
 
-            &.scroll-1-27 {
-              animation: anima127 90000ms linear infinite;
-            }
+            // &.scroll-1-26 {
+            //   animation: anima126 30000ms linear infinite;
+            // }
 
-            @keyframes anima127 {
-              0% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
+            // @keyframes anima126 {
+            //   0% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
 
-              30% {
-                transform: matrix(1, 0, 0, 1, 0, -758);
-              }
+            //   30% {
+            //     transform: matrix(1, 0, 0, 1, 0, -186);
+            //   }
 
-              50% {
-                transform: matrix(1, 0, 0, 1, 0, -758);
-              }
+            //   50% {
+            //     transform: matrix(1, 0, 0, 1, 0, -186);
+            //   }
 
-              80% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
+            //   80% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
 
-              100% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
-            }
+            //   100% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
+            // }
 
-            &.scroll-2-27 {
-              animation: anima227 90000ms linear infinite;
-            }
+            // &.scroll-1-27 {
+            //   animation: anima127 90000ms linear infinite;
+            // }
 
-            @keyframes anima227 {
-              0% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
+            // @keyframes anima127 {
+            //   0% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
 
-              30% {
-                transform: matrix(1, 0, 0, 1, 0, -835);
-              }
+            //   30% {
+            //     transform: matrix(1, 0, 0, 1, 0, -758);
+            //   }
 
-              50% {
-                transform: matrix(1, 0, 0, 1, 0, -835);
-              }
+            //   50% {
+            //     transform: matrix(1, 0, 0, 1, 0, -758);
+            //   }
 
-              80% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
+            //   80% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
 
-              100% {
-                transform: matrix(1, 0, 0, 1, 0, 0);
-              }
-            }
+            //   100% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
+            // }
+
+            // &.scroll-2-27 {
+            //   animation: anima227 90000ms linear infinite;
+            // }
+
+            // @keyframes anima227 {
+            //   0% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
+
+            //   30% {
+            //     transform: matrix(1, 0, 0, 1, 0, -835);
+            //   }
+
+            //   50% {
+            //     transform: matrix(1, 0, 0, 1, 0, -835);
+            //   }
+
+            //   80% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
+
+            //   100% {
+            //     transform: matrix(1, 0, 0, 1, 0, 0);
+            //   }
+            // }
           }
 
           .w-title {
@@ -824,7 +897,7 @@ export default {
           }
 
           .w-cn {
-            color: #000;
+            color: #fff;
             font-size: 16px;
             line-height: 26px;
             letter-spacing: 1.6px;
@@ -832,7 +905,7 @@ export default {
 
           .w-en {
             font-size: 16px;
-            color: #000;
+            color: #fff;
             line-height: 26px;
             word-break: break-all;
             word-wrap: break-word;
@@ -843,7 +916,7 @@ export default {
 
 
           .w-other {
-            color: #000;
+            color: #fff;
             position: relative;
             font-size: 16px;
             line-height: 26px;

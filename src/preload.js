@@ -4,5 +4,11 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // 监听器
-  uploadValue: (callback) => ipcRenderer.on('uploadValue', callback)
+  uploadValue: (callback) => ipcRenderer.on('uploadValue', callback),
+  // 获取配置文件路径
+  getPath: (key) => {
+    ipcRenderer.invoke('getPath', key)
+  },
+  // 
+  reset: (callback) => ipcRenderer.on('reset', callback),
 })
